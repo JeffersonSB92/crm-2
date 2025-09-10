@@ -12,19 +12,19 @@ import { BookUser } from 'lucide-react';
 
 export default function CountCard() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Total de Leads</CardTitle>
+    <Card className="bg-zinc-800 text-white border-zinc-500 min-h-[100px]">
+      <CardHeader className="pl-3 pb-0"> Total de Leads
+        {/* <CardTitle className="text-sm">Total de Leads</CardTitle> */}
         {/* <CardDescription>Card Description</CardDescription> */}
         <CardAction>
           <BookUser />
         </CardAction>
       </CardHeader>
-      <CardContent>
-        <h1>245</h1>
+      <CardContent className="pl-3 pt-0">
+        <h1 className="text-xl font-bold">245</h1>
       </CardContent>
-      <CardFooter>
-        <p>+12% em relação ao mês anterior</p>
+      <CardFooter className="pl-3 pt-0">
+        <p className="text-xs text-zinc-400">+12% em relação ao mês anterior</p>
       </CardFooter>
     </Card>
   );

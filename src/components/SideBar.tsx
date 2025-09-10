@@ -5,7 +5,7 @@ import { Home, Funnel, Users, Settings, Mail, MessageSquareMore, FileChartPie } 
 
 export default function SideBar() {
   return (
-    <aside className="w-64 h-screen bg-gray-900 text-white flex flex-col p-4">
+    <aside className="w-64 h-screen bg-zinc-800 text-white flex flex-col p-4">
       <h2 className="text-2xl font-bold mb-8">Meu CRM</h2>
       <nav className="space-y-4">
         <Link href="/" className="flex items-center gap-2 hover:text-gray-300">

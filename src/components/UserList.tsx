@@ -24,13 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { Lead, columns } from "./columns" // 👈 importa do passo 3
-
-const data: Lead[] = [
-  { id: "1", nome: "Carlos Silva", status: "Novo", valor: 15000, contato: "carlos@techsolutions.com" },
-  { id: "2", nome: "Ana Oliveira", status: "Em Contato", valor: 8500, contato: "ana@saudeintegral.com" },
-  { id: "3", nome: "Roberto Almeida", status: "Proposta", valor: 12000, contato: "roberto@educacaoplus.com" },
-]
+import { Lead, columns, data } from "./columns"
 
 export default function UserList() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -58,18 +52,18 @@ export default function UserList() {
   })
 
   return (
-    <div className="w-full">
+    <div className="w-full text-white">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar por nome..."
           value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("nome")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
+          className="max-w-sm text-white"
         />
       </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
+      <div className="overflow-hidden rounded-md border text-white">
+        <Table className="text-white">
+          <TableHeader className="text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (

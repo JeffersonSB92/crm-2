@@ -14,7 +14,7 @@ import { Phone, Clock, MoveRight } from "lucide-react";
 
 export function CardKanban() {
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm bg-zinc-200">
       <CardHeader>
         <CardTitle>Fernanda Lima</CardTitle>
         <CardDescription>Consultoria empresarial</CardDescription>

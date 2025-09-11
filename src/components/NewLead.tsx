@@ -30,11 +30,11 @@ export function DrawerDialogDemo() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="lg" className="bg-gray-900 text-white">
+        <Button size="lg" className="bg-zinc-100 text-black hover:bg-zinc-300">
           <ListPlus /> Novo Lead
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-zinc-100">
         <DialogHeader>
           <DialogTitle>Adicionar Lead</DialogTitle>
           <DialogDescription>

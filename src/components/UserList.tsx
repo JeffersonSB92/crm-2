@@ -61,13 +61,13 @@ export default function UserList() {
           className="max-w-sm text-white"
         />
       </div>
-      <div className="overflow-hidden rounded-md border text-white">
+      <div className="overflow-hidden rounded-md border-1">
         <Table >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-black bg-zinc-100">
+                  <TableHead key={header.id} className="text-black bg-zinc-200">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -79,7 +79,7 @@ export default function UserList() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="bg-zinc-800">
+                <TableRow key={row.id} className="bg-[#262626]">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-zinc-200">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

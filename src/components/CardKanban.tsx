@@ -14,7 +14,7 @@ import { Phone, Clock, MoveRight } from "lucide-react";
 
 export function CardKanban() {
   return (
-    <Card className="w-full max-w-sm bg-zinc-200">
+    <Card className="w-full max-w-sm bg-[#e5e5e5]">
       <CardHeader>
         <CardTitle>Fernanda Lima</CardTitle>
         <CardDescription>Consultoria empresarial</CardDescription>
@@ -24,10 +24,10 @@ export function CardKanban() {
       </CardHeader>
       <CardContent>
         <div className="flex gap-1">
-          <Badge variant="outline">R$ 18.000</Badge>
-          <Badge variant="secondary">Serviços</Badge>
-          <Badge variant="secondary">Consultoria</Badge>
+          <Badge >Serviços</Badge>
+          <Badge >Consultoria</Badge>
         </div>
+        <div>
         <p className="text-sm mt-4 text-zinc-500 flex items-center gap-1">
           <Clock size={12} />
           Hoje
@@ -36,11 +36,12 @@ export function CardKanban() {
           <MoveRight size={12} />
           Qualificar Lead
         </p>
+        </div>
       </CardContent>
       <CardFooter className="grid-col-2 justify-between">
         <div className="grid grid-cols-3 items-center">
           <Avatar className="mr-2">
-            <AvatarFallback>FL</AvatarFallback>
+            <AvatarFallback className="bg-zinc-800 text-zinc-100">FL</AvatarFallback>
           </Avatar>
           <Button variant="ghost">
             <Phone size={18} />

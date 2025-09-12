@@ -6,9 +6,9 @@ import CountCard from "@/components/CountCard";
 import UserList from "@/components/UserList";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Columns3, Rows3 } from "lucide-react";
+import { Columns3, Rows3, Inbox, Clock1, CircleCheckBig, CalendarClock } from "lucide-react";
 import NewLead, { DrawerDialogDemo } from "@/components/NewLead";
-import { Key, useState } from "react";
+import { useState } from "react";
 import { CardKanban } from "@/components/CardKanban";
 import {
   DialogHeader,
@@ -19,7 +19,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useSteps } from "@/hooks/useSteps";
-import { Step } from "@/models/Lead";
+// import { Step } from "@/models/Lead";
 
 export default function RootLayout({
   // children,
@@ -36,16 +36,16 @@ export default function RootLayout({
         <SideBar />
 
         {/* Conteúdo principal */}
-        <main className="flex-1 p-6 bg-zinc-950 overflow-y-auto">
+        <main className="flex-1 p-6 bg-[#161616] overflow-y-auto">
           <div className="text-right">
             <DrawerDialogDemo />
           </div>
-          <Separator className="my-10 mt-10 bg-gray-400" />
+          <Separator className="my-10 mt-4 bg-gray-400" />
           <div className="grid grid-cols-4 gap-4 w-full">
-            <CountCard />
-            <CountCard />
-            <CountCard />
-            <CountCard />
+            <CountCard title="Total de Leads" count="245" message="+12 em relação ao mês anterior" icon={Inbox}/>
+            <CountCard title="Leads em Andamento" count="145" message="59% do total de leads" icon={Clock1}/>
+            <CountCard title="Leads Fechados" count="64" message="26% do total de leads" icon={CircleCheckBig}/>
+            <CountCard title="Tarefas Pendentes" count="18" message="5 com vencimento hoje" icon={CalendarClock}/>
           </div>
           {/* <Separator className="mt-10 bg-gray-400" /> */}
           <div className="mt-10 grid-cols-2 text-right">

@@ -1,12 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Funnel, Users, Settings, Mail, MessageSquareMore, FileChartPie } from "lucide-react";
+import { Home, Funnel, Users, Settings, Mail, MessageSquareMore, FileChartPie, Columns3, LayoutList } from "lucide-react";
+import { Separator } from "./ui/separator";
 
 export default function SideBar() {
   return (
     <aside className="w-64 h-screen bg-zinc-800 text-white flex flex-col p-4">
-      <h2 className="text-2xl font-bold mb-8">Meu CRM</h2>
+      <div className="flex items-center gap-2 mb-6 mt-2">
+        <LayoutList className="w-8 h-8" />
+        <h2 className="text-2xl font-bold ml-4">Meu CRM</h2>
+      </div>
+      <Separator className="mb-8"/>
       <nav className="space-y-4">
         <Link href="/" className="flex items-center gap-2 hover:text-gray-300">
           <Home size={20} /> Dashboard

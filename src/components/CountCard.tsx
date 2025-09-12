@@ -2,30 +2,30 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
-import { BookUser } from 'lucide-react';
+export interface CountCardProps {
+  title: string,
+  count: string,
+  message: string,
+  icon: React.ElementType;
+}
 
-export default function CountCard() {
+export default function CountCard({ title, count, message, icon: Icon} : CountCardProps) {
   return (
-    <Card className="bg-zinc-200 text-black border-zinc-800 border-2 min-h-[100px]">
-      <CardHeader className="pl-3 pb-0"> Total de Leads
+    <Card className="bg-[#262626] text-zinc-100 border-[#404040] border-1 min-h-[100px] p-3">
+      <CardHeader className="pl-3 pb-0 font-bold p-0"> {title}
         {/* <CardTitle className="text-sm">Total de Leads</CardTitle> */}
         {/* <CardDescription>Card Description</CardDescription> */}
         <CardAction>
-          <BookUser />
+          <Icon />
         </CardAction>
       </CardHeader>
       <CardContent className="pl-3 pt-0">
-        <h1 className="text-xl font-bold">245</h1>
+        <h1 className="text-3xl font-bold pb-4">{count}</h1>
+        <p className="text-xs text-[#a1a1a1]">{message} em relação ao mês anterior</p>
       </CardContent>
-      <CardFooter className="pl-3 pt-0">
-        <p className="text-xs text-black">+12% em relação ao mês anterior</p>
-      </CardFooter>
     </Card>
   );
 }

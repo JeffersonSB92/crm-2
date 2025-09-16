@@ -11,6 +11,6 @@ export interface Lead {
 
 export interface Step {
   step_id: string
-  nome: string
+  name: string
   leads: Lead[]
 }

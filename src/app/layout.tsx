@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Columns3, Rows3, Inbox, Clock1, CircleCheckBig, CalendarClock } from "lucide-react";
 import NewLead, { DrawerDialogDemo } from "@/components/NewLead";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CardKanban } from "@/components/CardKanban";
 import {
   DialogHeader,
@@ -19,7 +19,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useSteps } from "@/hooks/useSteps";
-// import { Step } from "@/models/Lead";
+import { Step } from "@/models/Lead";
+import { getLeadsBySteps } from "@/controllers/leadController";
 
 export default function RootLayout({
   // children,
@@ -28,7 +29,17 @@ export default function RootLayout({
 }) {
   const [viewMode, setViewMode] = useState<"kanban" | "list">("list");
   const { steps, loading } = useSteps("de80ed4e-7d4d-4aad-8ae2-2af841beac63");
+  const [ leads, setLeads ] = useState<Step[]>([]);
 
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getLeadsBySteps("de80ed4e-7d4d-4aad-8ae2-2af841beac63");
+      console.log("Retorno cru do getLeadsByStep:", data);
+      setLeads(data);
+    }
+    fetchData();
+  }, []);
+  
   return (
     <html lang="pt-br">
       <body className="flex h-screen overflow-hidden">

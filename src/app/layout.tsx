@@ -15,7 +15,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import NewLead, { DrawerDialogDemo } from "@/components/NewLead";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { CardKanban } from "@/components/CardKanban";
 import {
   DialogHeader,
@@ -25,41 +25,22 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useSteps } from "@/hooks/useSteps";
-import { Step } from "@/models/Steps";
-import { LeadCard } from "@/models/LeadCard";
-import { getStepsByKanban } from "@/controllers/stepsController";
-import { getLeadsByStep } from "@/controllers/leadsController";
+import { StepWithLeads } from "@/models/Steps"; // novo type com leads embutidos
+import { getKanbanData } from "@/controllers/kanbanController"; // novo controller
 
-export default function RootLayout({}: // children,
-{
-  children: React.ReactNode;
-}) {
+export default function RootLayout({}: { children: React.ReactNode }) {
   const [viewMode, setViewMode] = useState<"kanban" | "list">("list");
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [leadsByStep, setLeadsByStep] = useState<Record<string, LeadCard[]>>(
-    {}
-  );
+  const [steps, setSteps] = useState<StepWithLeads[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const steps = await getStepsByKanban(
+        const steps = await getKanbanData(
           "de80ed4e-7d4d-4aad-8ae2-2af841beac63"
         );
         setSteps(steps);
-
-        const leadsMap: Record<string, LeadCard[]> = {};
-        await Promise.all(
-          steps.map(async (step) => {
-            const leads = await getLeadsByStep(step.step_id);
-            leadsMap[step.step_id] = leads;
-          })
-        );
-        setLeadsByStep(leadsMap);
-        console.log(leadsMap);
       } finally {
         setLoading(false);
       }
@@ -70,10 +51,8 @@ export default function RootLayout({}: // children,
   return (
     <html lang="pt-br">
       <body className="flex h-screen overflow-hidden">
-        {/* Sidebar fixa */}
         <SideBar />
 
-        {/* Conteúdo principal */}
         <main className="flex-1 p-6 bg-[#161616] overflow-y-auto">
           <div className="text-right">
             <DrawerDialogDemo />
@@ -105,12 +84,10 @@ export default function RootLayout({}: // children,
               icon={CalendarClock}
             />
           </div>
-          {/* <Separator className="mt-10 bg-gray-400" /> */}
+
           <div className="mt-10 grid-cols-2 text-right">
             <Button
-              onClick={() => {
-                setViewMode("kanban");
-              }}
+              onClick={() => setViewMode("kanban")}
               className={`mr-2 ${
                 viewMode === "kanban"
                   ? "bg-white text-black hover:bg-gray-200 hover:text-black"
@@ -121,9 +98,7 @@ export default function RootLayout({}: // children,
               Kanban
             </Button>
             <Button
-              onClick={() => {
-                setViewMode("list");
-              }}
+              onClick={() => setViewMode("list")}
               className={`${
                 viewMode === "list"
                   ? "bg-white text-black hover:bg-gray-200 hover:text-black"
@@ -134,6 +109,7 @@ export default function RootLayout({}: // children,
               List
             </Button>
           </div>
+
           <div className="text-white mt-6">
             {viewMode === "kanban" ? (
               loading ? (
@@ -151,8 +127,9 @@ export default function RootLayout({}: // children,
                       className="flex flex-col flex-wrap gap-2"
                     >
                       <p className="text-white">{step.name}</p>
-                      {/* Mapear leads do step */}
-                      {leadsByStep[step.step_id]?.map((lead) => (
+
+                      {/* Leads já estão dentro do step */}
+                      {step.leads.map((lead: { lead_id: Key | null | undefined; nome: string; empresa: string; ultima_atualizacao: string; atividade: string; iniciais: string; }) => (
                         <CardKanban
                           key={lead.lead_id}
                           nome={lead.nome}
@@ -162,6 +139,7 @@ export default function RootLayout({}: // children,
                           iniciais={lead.iniciais}
                         />
                       ))}
+
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button

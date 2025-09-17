@@ -6,7 +6,14 @@ import CountCard from "@/components/CountCard";
 import UserList from "@/components/UserList";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Columns3, Rows3, Inbox, Clock1, CircleCheckBig, CalendarClock } from "lucide-react";
+import {
+  Columns3,
+  Rows3,
+  Inbox,
+  Clock1,
+  CircleCheckBig,
+  CalendarClock,
+} from "lucide-react";
 import NewLead, { DrawerDialogDemo } from "@/components/NewLead";
 import { useEffect, useState } from "react";
 import { CardKanban } from "@/components/CardKanban";
@@ -19,27 +26,47 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useSteps } from "@/hooks/useSteps";
-import { Step } from "@/models/Lead";
-import { getLeadsBySteps } from "@/controllers/leadController";
+import { Step } from "@/models/Steps";
+import { LeadCard } from "@/models/LeadCard";
+import { getStepsByKanban } from "@/controllers/stepsController";
+import { getLeadsByStep } from "@/controllers/leadsController";
 
-export default function RootLayout({
-  // children,
-}: {
+export default function RootLayout({}: // children,
+{
   children: React.ReactNode;
 }) {
   const [viewMode, setViewMode] = useState<"kanban" | "list">("list");
-  const { steps, loading } = useSteps("de80ed4e-7d4d-4aad-8ae2-2af841beac63");
-  const [ leads, setLeads ] = useState<Step[]>([]);
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [leadsByStep, setLeadsByStep] = useState<Record<string, LeadCard[]>>(
+    {}
+  );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getLeadsBySteps("de80ed4e-7d4d-4aad-8ae2-2af841beac63");
-      console.log("Retorno cru do getLeadsByStep:", data);
-      setLeads(data);
+      setLoading(true);
+      try {
+        const steps = await getStepsByKanban(
+          "de80ed4e-7d4d-4aad-8ae2-2af841beac63"
+        );
+        setSteps(steps);
+
+        const leadsMap: Record<string, LeadCard[]> = {};
+        await Promise.all(
+          steps.map(async (step) => {
+            const leads = await getLeadsByStep(step.step_id);
+            leadsMap[step.step_id] = leads;
+          })
+        );
+        setLeadsByStep(leadsMap);
+        console.log(leadsMap);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, []);
-  
+
   return (
     <html lang="pt-br">
       <body className="flex h-screen overflow-hidden">
@@ -53,10 +80,30 @@ export default function RootLayout({
           </div>
           <Separator className="my-10 mt-4 bg-gray-400" />
           <div className="grid grid-cols-4 gap-4 w-full">
-            <CountCard title="Total de Leads" count="245" message="+12 em relação ao mês anterior" icon={Inbox}/>
-            <CountCard title="Leads em Andamento" count="145" message="59% do total de leads" icon={Clock1}/>
-            <CountCard title="Leads Fechados" count="64" message="26% do total de leads" icon={CircleCheckBig}/>
-            <CountCard title="Tarefas Pendentes" count="18" message="5 com vencimento hoje" icon={CalendarClock}/>
+            <CountCard
+              title="Total de Leads"
+              count="245"
+              message="+12 em relação ao mês anterior"
+              icon={Inbox}
+            />
+            <CountCard
+              title="Leads em Andamento"
+              count="145"
+              message="59% do total de leads"
+              icon={Clock1}
+            />
+            <CountCard
+              title="Leads Fechados"
+              count="64"
+              message="26% do total de leads"
+              icon={CircleCheckBig}
+            />
+            <CountCard
+              title="Tarefas Pendentes"
+              count="18"
+              message="5 com vencimento hoje"
+              icon={CalendarClock}
+            />
           </div>
           {/* <Separator className="mt-10 bg-gray-400" /> */}
           <div className="mt-10 grid-cols-2 text-right">
@@ -105,7 +152,16 @@ export default function RootLayout({
                     >
                       <p className="text-white">{step.name}</p>
                       {/* Mapear leads do step */}
-                        <CardKanban />
+                      {leadsByStep[step.step_id]?.map((lead) => (
+                        <CardKanban
+                          key={lead.lead_id}
+                          nome={lead.nome}
+                          empresa={lead.empresa}
+                          ultima_atualizacao={lead.ultima_atualizacao}
+                          atividade={lead.atividade}
+                          iniciais={lead.iniciais}
+                        />
+                      ))}
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button

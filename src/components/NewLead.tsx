@@ -23,8 +23,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ListPlus } from "lucide-react";
+import { createLead, CreateLeadData } from "@/controllers/leadsController";
+import { StepWithLeads } from "@/models/Steps";
+import { EmpresaSelector } from "@/components/EmpresaSelector";
 
-export function DrawerDialogDemo() {
+interface DrawerDialogDemoProps {
+  steps: StepWithLeads[]
+  onLeadCreated: () => void
+}
+
+export function DrawerDialogDemo({ steps, onLeadCreated }: DrawerDialogDemoProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -41,58 +49,151 @@ export function DrawerDialogDemo() {
             Preencha as informações para criação do lead.
           </DialogDescription>
         </DialogHeader>
-        <NewLead />
+        <NewLead 
+          steps={steps} 
+          onLeadCreated={() => {
+            onLeadCreated()
+            setOpen(false)
+          }} 
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
-export default function NewLead({ className }: React.ComponentProps<"form">) {
+interface NewLeadProps {
+  className?: string
+  steps: StepWithLeads[]
+  onLeadCreated: () => void
+}
+
+export default function NewLead({ className, steps, onLeadCreated }: NewLeadProps) {
+  const [formData, setFormData] = React.useState({
+    nome: "",
+    email: "",
+    telefone: "",
+    empresa_id: "",
+    cargo: "",
+    step_id: ""
+  });
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.nome || !formData.email || !formData.step_id || !formData.empresa_id) {
+      alert("Por favor, preencha pelo menos Nome, Email, Empresa e Etapa");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const leadData: CreateLeadData = {
+        nome: formData.nome,
+        email: formData.email,
+        telefone: formData.telefone,
+        empresa_id: formData.empresa_id,
+        cargo: formData.cargo,
+        step_id: formData.step_id
+      };
+
+      const result = await createLead(leadData);
+      
+      if (result) {
+        // Limpar formulário
+        setFormData({
+          nome: "",
+          email: "",
+          telefone: "",
+          empresa_id: "",
+          cargo: "",
+          step_id: ""
+        });
+        
+        // Notificar componente pai
+        onLeadCreated();
+      } else {
+        alert("Erro ao criar lead. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao criar lead:", error);
+      alert("Erro ao criar lead. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form className={cn("grid items-start gap-6", className)}>
+    <form className={cn("grid items-start gap-6", className)} onSubmit={handleSubmit}>
       <div className="grid gap-3">
-        <Label htmlFor="Nome">Nome</Label>
-        <Input id="nome" placeholder="Insira o nome do lead..." />
+        <Label htmlFor="nome">Nome *</Label>
+        <Input 
+          id="nome" 
+          placeholder="Insira o nome do lead..." 
+          value={formData.nome}
+          onChange={(e) => setFormData({...formData, nome: e.target.value})}
+          required
+        />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Email *</Label>
         <Input
           type="email"
           id="email"
           placeholder="Insira o email do lead..."
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          required
         />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="phone">Telefone</Label>
-        <Input id="phone" placeholder="Insira o telefone do lead..." />
+        <Label htmlFor="telefone">Telefone</Label>
+        <Input 
+          id="telefone" 
+          placeholder="Insira o telefone do lead..." 
+          value={formData.telefone}
+          onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+        />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="company">Empresa</Label>
-        <Input id="company" placeholder="Insira o nome da empresa do lead..." />
+        <Label htmlFor="empresa">Empresa *</Label>
+        <EmpresaSelector
+          value={formData.empresa_id}
+          onValueChange={(value) => setFormData({...formData, empresa_id: value})}
+          placeholder="Selecione uma empresa..."
+        />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="occupation">Cargo</Label>
-        <Input id="occupation" placeholder="Insira o cargo do lead..." />
+        <Label htmlFor="cargo">Cargo</Label>
+        <Input 
+          id="cargo" 
+          placeholder="Insira o cargo do lead..." 
+          value={formData.cargo}
+          onChange={(e) => setFormData({...formData, cargo: e.target.value})}
+        />
       </div>
       <div className="grid gap-3">
-        <Label htmlFor="occupation">Status</Label>
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Selecione o status..." />
+        <Label htmlFor="etapa">Etapa *</Label>
+        <Select value={formData.step_id} onValueChange={(value) => setFormData({...formData, step_id: value})}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecione a etapa..." />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>Status</SelectLabel>
-              <SelectItem value="apple">Novo</SelectItem>
-              <SelectItem value="banana">Em Andamento</SelectItem>
-              <SelectItem value="blueberry">Proposta</SelectItem>
-              <SelectItem value="grapes">Perdido</SelectItem>
-              <SelectItem value="pineapple">Fechado</SelectItem>
+              <SelectLabel>Etapas</SelectLabel>
+              {steps.map((step) => (
+                <SelectItem key={step.step_id} value={step.step_id}>
+                  {step.name}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit">Save changes</Button>
+      <Button type="submit" disabled={loading}>
+        {loading ? "Criando..." : "Criar Lead"}
+      </Button>
     </form>
   );
 }

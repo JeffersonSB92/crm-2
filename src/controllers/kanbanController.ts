@@ -1,23 +1,8 @@
 // controllers/kanbanController.ts
 import { supabase } from "../lib/supabaseClient"
+import { LeadCard, StepWithLeads } from "../models/Steps"
 
-export interface LeadCard {
-  lead_id: string
-  step_id: string
-  nome: string
-  iniciais: string
-  empresa: string
-  ultima_atualizacao: string
-  atividade: string
-}
-
-export interface Step {
-  step_id: string
-  name: string
-  leads: LeadCard[]
-}
-
-export async function getKanbanData(kanbanId: string): Promise<Step[]> {
+export async function getKanbanData(kanbanId: string): Promise<StepWithLeads[]> {
   // Buscar todos os steps do kanban
   const { data: steps, error: stepsError } = await supabase
     .from("kanban_steps")
@@ -56,27 +41,91 @@ export async function getKanbanData(kanbanId: string): Promise<Step[]> {
   }
 
   // Transformar leads para o formato flat
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leadsFlat: LeadCard[] = (leads ?? []).map((lead: any) => {
-    const pessoa = lead.pessoa?.[0]
-    const empresa = pessoa?.empresa?.[0]
-    const atividade = lead.atividade?.[0]
+    const pessoa = lead.pessoa
+    const empresa = pessoa?.empresa
+    const atividade = lead.atividade
 
     return {
       lead_id: lead.lead_id,
       step_id: lead.step_id,
-      nome: pessoa?.nome ?? "",
-      iniciais: pessoa?.iniciais ?? "",
-      empresa: empresa?.nome ?? "",
-      ultima_atualizacao: lead.ultima_atualizacao ?? "",
-      atividade: atividade?.titulo ?? "",
+      nome: pessoa?.nome ?? "Nome não informado",
+      iniciais: pessoa?.iniciais ?? "NI",
+      empresa: empresa?.nome ?? "Empresa não informada",
+      ultima_atualizacao: lead.ultima_atualizacao ?? "Sem atualização",
+      atividade: atividade?.titulo ?? "Sem atividade",
     }
   })
 
   // Agrupar leads por step
-  const stepsWithLeads: Step[] = steps.map(step => ({
+  const stepsWithLeads: StepWithLeads[] = steps.map(step => ({
     ...step,
     leads: leadsFlat.filter(lead => lead.step_id === step.step_id),
   }))
 
   return stepsWithLeads
+}
+
+// Função para mover lead para próxima etapa
+export async function moveLeadToNextStep(leadId: string, currentStepId: string, steps: StepWithLeads[]): Promise<boolean> {
+  try {
+    // Encontrar o índice da etapa atual
+    const currentStepIndex = steps.findIndex(step => step.step_id === currentStepId)
+    
+    // Verificar se existe próxima etapa
+    if (currentStepIndex === -1 || currentStepIndex >= steps.length - 1) {
+      console.log("Não há próxima etapa disponível")
+      return false
+    }
+    
+    // Obter o ID da próxima etapa
+    const nextStepId = steps[currentStepIndex + 1].step_id
+    
+    // Atualizar no banco de dados
+    const { error } = await supabase
+      .from("lead")
+      .update({ 
+        step_id: nextStepId,
+        ultima_atualizacao: new Date().toISOString()
+      })
+      .eq("lead_id", leadId)
+    
+    if (error) {
+      console.error("Erro ao mover lead:", error)
+      return false
+    }
+    
+    console.log(`Lead ${leadId} movido da etapa ${currentStepId} para ${nextStepId}`)
+    return true
+    
+  } catch (error) {
+    console.error("Erro ao mover lead:", error)
+    return false
+  }
+}
+
+// Função para mover lead para etapa específica
+export async function moveLeadToStep(leadId: string, targetStepId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("lead")
+      .update({ 
+        step_id: targetStepId,
+        ultima_atualizacao: new Date().toISOString()
+      })
+      .eq("lead_id", leadId)
+    
+    if (error) {
+      console.error("Erro ao mover lead:", error)
+      return false
+    }
+    
+    console.log(`Lead ${leadId} movido para etapa ${targetStepId}`)
+    return true
+    
+  } catch (error) {
+    console.error("Erro ao mover lead:", error)
+    return false
+  }
 }

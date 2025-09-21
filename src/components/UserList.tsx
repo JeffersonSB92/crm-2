@@ -53,21 +53,21 @@ export default function UserList() {
 
   return (
     <div className="w-full text-white">
-      <div className="flex items-center py-4">
+      {/* <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar por nome..."
           value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("nome")?.setFilterValue(event.target.value)}
           className="max-w-sm text-white"
         />
-      </div>
+      </div> */}
       <div className="overflow-hidden rounded-md border-1">
         <Table >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-black bg-zinc-200">
+                  <TableHead key={header.id} className="text-black bg-[#EBEBEB]">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -79,7 +79,7 @@ export default function UserList() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="bg-[#262626]">
+                <TableRow key={row.id} className="bg-[#293b4a]">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-zinc-200">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

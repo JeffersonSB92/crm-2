@@ -6,7 +6,7 @@ import { Separator } from "./ui/separator";
 
 export default function SideBar() {
   return (
-    <aside className="w-64 h-screen bg-zinc-800 text-white flex flex-col p-4">
+    <aside className="w-64 h-screen bg-[#293b4a] text-white flex flex-col p-4">
       <div className="flex items-center gap-2 mb-6 mt-2">
         <LayoutList className="w-8 h-8" />
         <h2 className="text-2xl font-bold ml-4">Meu CRM</h2>

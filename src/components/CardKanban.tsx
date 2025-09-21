@@ -22,7 +22,7 @@ export interface CardKanbanProps {
 
 export function CardKanban({ nome, empresa, ultima_atualizacao, atividade, iniciais } : CardKanbanProps) {
   return (
-    <Card className="w-full max-w-sm bg-[#e5e5e5]">
+    <Card className="w-full max-w-sm bg-[#293b4a]">
       <CardHeader>
         <CardTitle>{nome}</CardTitle>
         <CardDescription>{empresa}</CardDescription>

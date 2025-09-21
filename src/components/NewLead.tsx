@@ -30,7 +30,7 @@ export function DrawerDialogDemo() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="bg-zinc-100 text-black hover:bg-zinc-300">
+        <Button size="lg" className="bg-zinc-200 text-black hover:bg-zinc-300">
           <ListPlus /> Novo Lead
         </Button>
       </DialogTrigger>

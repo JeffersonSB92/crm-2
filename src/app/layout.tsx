@@ -27,9 +27,12 @@ import {
 } from "@/components/ui/dialog";
 import { StepWithLeads } from "@/models/Steps"; // novo type com leads embutidos
 import { getKanbanData } from "@/controllers/kanbanController"; // novo controller
+import { Menubar } from "@/components/ui/menubar";
+import { MenubarMenu, MenubarTrigger } from "@radix-ui/react-menubar";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function RootLayout({}: { children: React.ReactNode }) {
-  const [viewMode, setViewMode] = useState<"kanban" | "list">("list");
+  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
   const [steps, setSteps] = useState<StepWithLeads[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +56,7 @@ export default function RootLayout({}: { children: React.ReactNode }) {
       <body className="flex h-screen overflow-hidden">
         <SideBar />
 
-        <main className="flex-1 p-6 bg-[#161616] overflow-y-auto">
+        <main className="flex-1 p-6 bg-[#0d1b2a] overflow-y-auto">
           <div className="text-right">
             <DrawerDialogDemo />
           </div>
@@ -85,29 +88,15 @@ export default function RootLayout({}: { children: React.ReactNode }) {
             />
           </div>
 
-          <div className="mt-10 grid-cols-2 text-right">
-            <Button
-              onClick={() => setViewMode("kanban")}
-              className={`mr-2 ${
-                viewMode === "kanban"
-                  ? "bg-white text-black hover:bg-gray-200 hover:text-black"
-                  : "bg-zinc-950 text-white hover:bg-zinc-950 hover:text-white"
-              }`}
-            >
-              <Columns3 />
-              Kanban
-            </Button>
-            <Button
-              onClick={() => setViewMode("list")}
-              className={`${
-                viewMode === "list"
-                  ? "bg-white text-black hover:bg-gray-200 hover:text-black"
-                  : "bg-zinc-950 text-white hover:bg-zinc-950 hover:text-white"
-              }`}
-            >
-              <Rows3 />
-              List
-            </Button>
+          <div className="mt-10 grid-cols-2 text-left">
+
+            <Tabs defaultValue="kanban">
+              <TabsList className="bg-zinc-200">
+                <TabsTrigger value="kanban" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("kanban")}>Kanban</TabsTrigger>
+                <TabsTrigger value="lista" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("list")}>Lista</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
           </div>
 
           <div className="text-white mt-6">
@@ -126,7 +115,7 @@ export default function RootLayout({}: { children: React.ReactNode }) {
                       key={step.step_id}
                       className="flex flex-col flex-wrap gap-2"
                     >
-                      <p className="text-white">{step.name}</p>
+                      <p className="text-white font-bold">{step.name}</p>
 
                       {/* Leads já estão dentro do step */}
                       {step.leads.map((lead: { lead_id: Key | null | undefined; nome: string; empresa: string; ultima_atualizacao: string; atividade: string; iniciais: string; }) => (

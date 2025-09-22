@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { Home, Funnel, Users, Settings, Mail, MessageSquareMore, FileChartPie, Columns3, LayoutList } from "lucide-react";
 import { Separator } from "./ui/separator";
+import Image from "next/image";
 
 export default function SideBar() {
   return (
     <aside className="w-64 h-screen bg-[#293b4a] text-white flex flex-col p-4">
-      <div className="flex items-center gap-2 mb-6 mt-2">
-        <LayoutList className="w-8 h-8" />
-        <h2 className="text-2xl font-bold ml-4">Meu CRM</h2>
+      <div className="flex items-center gap-2 mb-6 mt-2 ml-2">
+        {/* <LayoutList className="w-8 h-8" /> */}
+        <Image src="/slothIcon.svg" alt="Sloth CRM" width={50} height={50} />
+        <h2 className="text-2xl font-bold ml-2">Sloth CRM</h2>
       </div>
       <Separator className="mb-8"/>
       <nav className="space-y-4">

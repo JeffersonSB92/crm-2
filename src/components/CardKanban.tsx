@@ -87,7 +87,7 @@ export function CardKanban({
                     className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <Trash2 size={16} className="mr-2" />
+                    <Trash2 size={16} className="mr-2 text-red-600" />
                     Excluir
                   </DropdownMenuItem>
                 </AlertDialogTrigger>

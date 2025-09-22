@@ -305,6 +305,7 @@ export default function RootLayout({}: { children: React.ReactNode }) {
                           {step.leads.map((lead: LeadCard) => {
                             const isLastStep = steps.indexOf(step) === steps.length - 1;
                             const isMoving = movingLead === lead.lead_id;
+                            const formatedDate = new Date(lead.ultima_atualizacao).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                             
                             return (
                               <DraggableItem
@@ -314,7 +315,7 @@ export default function RootLayout({}: { children: React.ReactNode }) {
                                 <CardKanban
                                   nome={lead.nome}
                                   empresa={lead.empresa}
-                                  ultima_atualizacao={lead.ultima_atualizacao}
+                                  ultima_atualizacao={formatedDate}
                                   atividade={lead.atividade}
                                   iniciais={lead.iniciais}
                                   lead_id={lead.lead_id}

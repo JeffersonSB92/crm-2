@@ -97,33 +97,33 @@ export async function moveLeadToNextStep(leadId: string, currentStepId: string, 
   try {
     // Encontrar o índice da etapa atual
     const currentStepIndex = steps.findIndex(step => step.step_id === currentStepId)
-    
+
     // Verificar se existe próxima etapa
     if (currentStepIndex === -1 || currentStepIndex >= steps.length - 1) {
       console.log("Não há próxima etapa disponível")
       return false
     }
-    
+
     // Obter o ID da próxima etapa
     const nextStepId = steps[currentStepIndex + 1].step_id
-    
+
     // Atualizar no banco de dados
     const { error } = await supabase
       .from("lead")
-      .update({ 
+      .update({
         step_id: nextStepId,
         ultima_atualizacao: new Date().toISOString()
       })
       .eq("lead_id", leadId)
-    
+
     if (error) {
       console.error("Erro ao mover lead:", error)
       return false
     }
-    
+
     console.log(`Lead ${leadId} movido da etapa ${currentStepId} para ${nextStepId}`)
     return true
-    
+
   } catch (error) {
     console.error("Erro ao mover lead:", error)
     return false
@@ -135,20 +135,20 @@ export async function moveLeadToStep(leadId: string, targetStepId: string): Prom
   try {
     const { error } = await supabase
       .from("lead")
-      .update({ 
+      .update({
         step_id: targetStepId,
         ultima_atualizacao: new Date().toISOString()
       })
       .eq("lead_id", leadId)
-    
+
     if (error) {
       console.error("Erro ao mover lead:", error)
       return false
     }
-    
+
     console.log(`Lead ${leadId} movido para etapa ${targetStepId}`)
     return true
-    
+
   } catch (error) {
     console.error("Erro ao mover lead:", error)
     return false
@@ -216,7 +216,38 @@ export async function createLead(leadData: CreateLeadData): Promise<LeadResponse
       return null
     }
 
-    return leadDataResult as LeadResponse
+    // --- Normalização ---
+    const pessoaRaw = Array.isArray(leadDataResult.pessoa)
+      ? leadDataResult.pessoa[0]
+      : leadDataResult.pessoa
+
+    const atividadeRaw = Array.isArray(leadDataResult.atividade)
+      ? leadDataResult.atividade[0]
+      : leadDataResult.atividade
+
+    const empresaRaw = pessoaRaw
+      ? (Array.isArray(pessoaRaw.empresa) ? pessoaRaw.empresa[0] : pessoaRaw.empresa)
+      : null
+
+    const normalizedLead: LeadResponse = {
+      lead_id: leadDataResult.lead_id,
+      step_id: leadDataResult.step_id,
+      ultima_atualizacao: leadDataResult.ultima_atualizacao,
+      pessoa: pessoaRaw
+        ? {
+          nome: pessoaRaw.nome ?? "",
+          iniciais: pessoaRaw.iniciais ?? "",
+          empresa: {
+            nome: empresaRaw?.nome ?? ""
+          }
+        }
+        : { nome: "", iniciais: "", empresa: { nome: "" } }, // fallback seguro
+      atividade: atividadeRaw
+        ? { titulo: atividadeRaw.titulo ?? "" }
+        : null
+    }
+
+    return normalizedLead
 
   } catch (error) {
     console.error("Erro geral ao criar lead:", error)
@@ -246,7 +277,7 @@ export async function deleteLead(leadId: string): Promise<boolean> {
 }
 
 // Função para buscar empresas existentes
-export async function getEmpresas(): Promise<{empresa_id: string, nome: string}[]> {
+export async function getEmpresas(): Promise<{ empresa_id: string, nome: string }[]> {
   try {
     const { data, error } = await supabase
       .from("empresa")
@@ -266,7 +297,7 @@ export async function getEmpresas(): Promise<{empresa_id: string, nome: string}[
 }
 
 // Função para criar uma nova empresa
-export async function createEmpresa(nome: string): Promise<{empresa_id: string} | null> {
+export async function createEmpresa(nome: string): Promise<{ empresa_id: string } | null> {
   try {
     const { data, error } = await supabase
       .from("empresa")

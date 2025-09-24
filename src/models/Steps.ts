@@ -4,6 +4,7 @@ export interface Step {
 }
 
 export interface LeadCard {
+  valor: number
   lead_id: string
   step_id: string
   nome: string

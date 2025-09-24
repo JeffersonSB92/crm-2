@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getKanbanData, Step } from "../controllers/kanbanController";
+import { getKanbanData } from "../controllers/kanbanController";
+import { Step } from "@/models/Steps";
 
 export function useKanban(kanbanId: string) {
   const [steps, setSteps] = useState<Step[]>([]);

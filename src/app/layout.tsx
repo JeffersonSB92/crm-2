@@ -370,7 +370,19 @@ export default function RootLayout({ }: { children: React.ReactNode }) {
                 </DndContext>
               )
             ) : (
-              <UserList />
+              <UserList
+                data={steps.flatMap(step =>
+                  step.leads.map((lead: LeadCard) => ({
+                    lead_id: lead.lead_id,
+                    nome: lead.nome,
+                    iniciais: lead.iniciais,
+                    empresa: lead.empresa,
+                    status: step.name,
+                    valor: lead.valor ?? 0,
+                    email: lead.email
+                  }))
+                )}
+              />
             )}
           </div>
         </main>

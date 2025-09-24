@@ -9,6 +9,7 @@ export interface LeadCard {
   nome: string
   iniciais: string
   empresa: string
+  email: string
   ultima_atualizacao: string
   atividade: string
 }

@@ -11,10 +11,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  Row,
+  ColumnDef,
 } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -23,14 +24,73 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Badge } from "./ui/badge"
 
-import { Lead, columns, data } from "./columns"
+// Interface do lead que será passada via props
+export interface LeadListItem {
+  lead_id: string
+  nome: string
+  iniciais: string
+  empresa: string
+  status: string
+  valor?: number
+  email: string
+}
 
-export default function UserList() {
+export interface UserListProps {
+  data: LeadListItem[];
+}
+
+export default function UserList({ data }: UserListProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+
+  // Definição das colunas da tabela
+  const columns: ColumnDef<LeadListItem>[] = [
+    {
+      accessorKey: "nome",
+      header: "Lead",
+      cell: ({ row }: { row: Row<LeadListItem> }) => (
+        <div className="flex">
+          <Avatar className="mr-2">
+            <AvatarFallback className="bg-white text-black">{row.original.iniciais}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div>{row.original.nome}</div>
+            <div className="text-xs text-zinc-400">{row.original.empresa}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }: { row: Row<LeadListItem> }) => (
+        <Badge className="bg-zinc-200 text-black"> {row.original.status} </Badge>
+      )
+    },
+    {
+      accessorKey: "valor",
+      header: "Valor",
+      cell: ({ row }: { row: Row<LeadListItem> }) => {
+        const value = row.original.valor ?? 0
+        return new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          minimumFractionDigits: 2
+        }).format(value)
+      },
+    },
+    {
+      accessorKey: "email",
+      header: "Contato",
+      cell: ({ row }: { row: Row<LeadListItem> }) => <div>{row.original.email}</div>,
+    },
+  ]
+
 
   const table = useReactTable({
     data,
@@ -43,26 +103,13 @@ export default function UserList() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
+    state: { sorting, columnFilters, columnVisibility, rowSelection },
   })
 
   return (
     <div className="w-full text-white">
-      {/* <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por nome..."
-          value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("nome")?.setFilterValue(event.target.value)}
-          className="max-w-sm text-white"
-        />
-      </div> */}
       <div className="overflow-hidden rounded-md border-1">
-        <Table >
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -77,7 +124,7 @@ export default function UserList() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="bg-[#293b4a]">
                   {row.getVisibleCells().map((cell) => (

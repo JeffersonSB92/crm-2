@@ -50,6 +50,7 @@ export async function getKanbanData(kanbanId: string): Promise<StepWithLeads[]> 
       pessoa:pessoa_id (
         nome,
         iniciais,
+        email,
         empresa:empresa_id (
           nome
         )
@@ -70,6 +71,8 @@ export async function getKanbanData(kanbanId: string): Promise<StepWithLeads[]> 
   const leadsFlat: LeadCard[] = (leads ?? []).map((lead: any) => {
     const pessoa = lead.pessoa
     const empresa = pessoa?.empresa
+    const email = lead.email
+    const valor = 0
     const atividade = lead.atividade
 
     return {
@@ -78,6 +81,8 @@ export async function getKanbanData(kanbanId: string): Promise<StepWithLeads[]> 
       nome: pessoa?.nome ?? "Nome não informado",
       iniciais: pessoa?.iniciais ?? "NI",
       empresa: empresa?.nome ?? "Empresa não informada",
+      email: pessoa.email ?? "Pessoa não informada",
+      valor: lead.valor ?? 0,
       ultima_atualizacao: lead.ultima_atualizacao ?? "Sem atualização",
       atividade: atividade?.titulo ?? "Sem atividade",
     }

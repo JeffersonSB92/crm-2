@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ListPlus } from "lucide-react";
-import { createLead, CreateLeadData } from "@/controllers/leadsController";
+import { createLead, CreateLeadData } from "@/controllers/kanbanController";
 import { StepWithLeads } from "@/models/Steps";
 import { EmpresaSelector } from "@/components/EmpresaSelector";
 

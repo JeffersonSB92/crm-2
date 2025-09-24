@@ -32,8 +32,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { StepWithLeads, LeadCard } from "@/models/Steps"; // novo type com leads embutidos
-import { getKanbanData, moveLeadToNextStep } from "@/controllers/kanbanController"; // novo controller
-import { deleteLead } from "@/controllers/leadsController";
+import { getKanbanData, moveLeadToNextStep, deleteLead } from "@/controllers/kanbanController"; // novo controller
+// import { deleteLead } from "@/controllers/leadsController";
 import { supabase } from "@/lib/supabaseClient";
 import { DroppableArea } from "@/components/DroppableArea";
 import { DraggableItem } from "@/components/DraggableItem";

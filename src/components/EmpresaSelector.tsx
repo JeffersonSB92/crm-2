@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getEmpresas, createEmpresa } from "@/controllers/leadsController";
+import { getEmpresas, createEmpresa } from "@/controllers/kanbanController";
 
 interface Empresa {
   empresa_id: string;

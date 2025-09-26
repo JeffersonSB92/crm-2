@@ -32,7 +32,7 @@ interface DrawerDialogDemoProps {
   onLeadCreated: () => void
 }
 
-export function DrawerDialogDemo({ steps, onLeadCreated }: DrawerDialogDemoProps) {
+export function NewLeadButton({ steps, onLeadCreated }: DrawerDialogDemoProps) {
   const [open, setOpen] = React.useState(false);
 
   return (

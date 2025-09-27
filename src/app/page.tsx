@@ -34,13 +34,17 @@ import {
 } from "@dnd-kit/core";
 import { getKanbanData, moveLeadToNextStep, deleteLead } from "@/controllers/kanbanController";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+import AtividadesPage from "../components/Atividades";
 
 export default function Dashboard() {
-  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
+  const [viewMode, setViewMode] = useState<"kanban" | "list" | "ativity">("kanban");
   const [steps, setSteps] = useState<StepWithLeads[]>([]);
   const [loading, setLoading] = useState(true);
   const [movingLead, setMovingLead] = useState<string | null>(null);
   const [activeLead, setActiveLead] = useState<LeadCard | null>(null);
+
+  const router = useRouter();
 
   // Configuração dos sensores para drag and drop
   const sensors = useSensors(
@@ -247,6 +251,7 @@ export default function Dashboard() {
           <TabsList className="bg-zinc-200">
             <TabsTrigger value="kanban" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("kanban")}>Kanban</TabsTrigger>
             <TabsTrigger value="lista" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("list")}>Lista</TabsTrigger>
+            <TabsTrigger value="atividades" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("ativity")}>Atividades</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -345,7 +350,7 @@ export default function Dashboard() {
               </div>
             </DndContext>
           )
-        ) : (
+        ) : viewMode === "list" ? (
           <UserList
             data={steps.flatMap(step =>
               step.leads.map((lead: LeadCard) => ({
@@ -359,7 +364,9 @@ export default function Dashboard() {
               }))
             )}
           />
-        )}
+        ) : viewMode === "ativity" ? (
+          <AtividadesPage />
+        ) : null}
       </div>
     </>
   )

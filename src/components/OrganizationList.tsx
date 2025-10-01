@@ -13,76 +13,17 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, Edit, MoreHorizontal, Trash } from "lucide-react"
+import { ArrowUpDown, Edit, Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { NewOrgButton } from "./NewOrg"
+import { getAllOrgs, OrgResponse, deleteOrg } from "@/controllers/organizationController"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    segmento: "Lorem Ipsum",
-    nome: "Banana Inc",
-    email: "ken99@example.com",
-    responsavel: "Fernando Lopes",
-  },
-  {
-    id: "3u1reuv4",
-    segmento: "Lorem Ipsum",
-    nome: "Jurandir LTDA",
-    email: "Abe45@example.com",
-    responsavel: "Fernando Lopes",
-  },
-  {
-    id: "derv1ws0",
-    segmento: "Lorem Ipsum",
-    nome: "ABC org",
-    email: "Monserrat44@example.com",
-    responsavel: "Fernando Lopes",
-  },
-  {
-    id: "5kma53ae",
-    segmento: "Lorem Ipsum",
-    nome: "Alpha Sigma",
-    email: "Silas22@example.com",
-    responsavel: "Fernando Lopes",
-  },
-  {
-    id: "bhqecj4p",
-    segmento: "Lorem Ipsum",
-    nome: "Batinha Store",
-    email: "carmella@example.com",
-    responsavel: "Fernando Lopes",
-  },
-]
-
-export type Payment = {
-  id: string
-  segmento: string
-  email: string
-  nome: string
-  responsavel: string
-}
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<OrgResponse>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -108,64 +49,92 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "nome",
     header: "Nome",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("nome")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown />
-        </Button>
-      )
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="text-black"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Email
+        <ArrowUpDown className="ml-1" />
+      </Button>
+    ),
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "responsavel",
     header: "Responsável",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("responsavel")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("responsavel")}</div>,
   },
   {
     accessorKey: "segmento",
     header: "Segmento",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("segmento")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("segmento")}</div>,
+  },
+  {
+    accessorKey: "numero_colaboradores",
+    header: "Colaboradores",
+    cell: ({ row }) => <div>{row.getValue("numero_colaboradores")}</div>,
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const org = row.original
 
+      const handleDelete = async () => {
+        const success = await deleteOrg(org.empresa_id)
+        if (success) {
+          // depois de excluir, recarregar a lista
+          // você pode emitir um evento ou chamar fetchOrgs se passar por prop
+          window.location.reload() // solução rápida
+        }
+
+      }
       return (
         <div className="flex justify-end gap-2 w-full">
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700"
-            onClick={() => console.log("Editar:", payment.id)}
+            onClick={() => console.log("Editar:", org.nome)}
           >
             <Edit className="h-4 w-4" />
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-            onClick={() => console.log("Excluir:", payment.id)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
+            <AlertDialogContent className="bg-zinc-100">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Excluir empresa?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação vai excluir a empresa e <strong>todas as pessoas vinculadas</strong>.
+                  Deseja realmente continuar?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleDelete}
+                >
+                  Sim, excluir
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )
     },
@@ -173,13 +142,23 @@ export const columns: ColumnDef<Payment>[] = [
 ]
 
 export function OrganizationList() {
+  const [data, setData] = React.useState<OrgResponse[]>([])
+  const [loading, setLoading] = React.useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+
+  const fetchOrgs = async () => {
+    setLoading(true)
+    const orgs = await getAllOrgs()
+    setData(orgs)
+    setLoading(false)
+  }
+
+  React.useEffect(() => {
+    fetchOrgs()
+  }, [])
 
   const table = useReactTable({
     data,
@@ -212,69 +191,61 @@ export function OrganizationList() {
           className="max-w-sm"
         />
         <div className="flex items-center justify-end space-x-2 py-4">
-          <Button variant="secondary" className="bg-zinc-200">
-            Adicionar Organização
-          </Button>
+          <NewOrgButton onOrgCreated={fetchOrgs} />
         </div>
       </div>
+
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-[#293b4a]">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="text-black bg-[#EBEBEB]">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="text-black bg-[#EBEBEB]">
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-200">
+                  Carregando organizações...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="bg-[#293b4a]"
+                  className="bg-[#293b4a] text-zinc-200"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-zinc-200">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
+                <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-200">
+                  Nenhuma organização encontrada.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm text-zinc-100">
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
-          {table.getFilteredRowModel().rows.length}
-          {table.getFilteredRowModel().rows.length === 1
-            ? " linha selecionada"
-            : " linhas selecionadas"}
+          {table.getFilteredRowModel().rows.length}{" "}
+          {table.getFilteredRowModel().rows.length === 1 ? "linha selecionada" : "linhas selecionadas"}
         </div>
         <div className="space-x-2">
           <Button

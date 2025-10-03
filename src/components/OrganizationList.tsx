@@ -21,142 +21,17 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { NewOrgButton } from "./NewOrg"
 import { getAllOrgs, OrgResponse, deleteOrg } from "@/controllers/organizationController"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog"
-
-export const columns: ColumnDef<OrgResponse>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "nome",
-    header: "Nome",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        className="text-black"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Email
-        <ArrowUpDown className="ml-1" />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "responsavel",
-    header: "Responsável",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("responsavel")}</div>,
-  },
-  {
-    accessorKey: "segmento",
-    header: "Segmento",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("segmento")}</div>,
-  },
-  {
-    accessorKey: "numero_colaboradores",
-    header: "Colaboradores",
-    cell: ({ row }) => <div>{row.getValue("numero_colaboradores")}</div>,
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const org = row.original
-
-      const handleDelete = async () => {
-        const success = await deleteOrg(org.empresa_id)
-        if (success) {
-          // depois de excluir, recarregar a lista
-          // você pode emitir um evento ou chamar fetchOrgs se passar por prop
-          window.location.reload() // solução rápida
-        }
-
-      }
-      const [openEdit, setOpenEdit] = React.useState(false)
-      const [data, setData] = React.useState<OrgResponse[]>([])
-      const [loading, setLoading] = React.useState(false)
-      const fetchOrgs = async () => {
-        setLoading(true)
-        const orgs = await getAllOrgs()
-        setData(orgs)
-        setLoading(false)
-      }
-      return (
-        <div className="flex justify-end gap-2 w-full">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700"
-            onClick={() => setOpenEdit(true)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-
-          <NewOrgButton
-            mode="update"
-            org={org}
-            open={openEdit}
-            onOpenChange={setOpenEdit}
-            onOrgSaved={fetchOrgs}
-          />
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent className="bg-zinc-100">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Excluir empresa?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Esta ação vai excluir a empresa e <strong>todas as pessoas vinculadas</strong>.
-                  Deseja realmente continuar?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={handleDelete}
-                >
-                  Sim, excluir
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )
-    },
-  },
-]
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog"
 
 export function OrganizationList() {
   const [data, setData] = React.useState<OrgResponse[]>([])
@@ -177,6 +52,133 @@ export function OrganizationList() {
   React.useEffect(() => {
     fetchOrgs()
   }, [])
+
+  const columns: ColumnDef<OrgResponse>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "nome",
+      header: "Nome",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("nome")}</div>,
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          className="text-black"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <ArrowUpDown className="ml-1" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    },
+    {
+      accessorKey: "responsavel",
+      header: "Responsável",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("responsavel")}</div>,
+    },
+    {
+      accessorKey: "segmento",
+      header: "Segmento",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("segmento")}</div>,
+    },
+    {
+      accessorKey: "num_colaboradores",
+      header: "Colaboradores",
+      cell: ({ row }) => <div>{row.getValue("num_colaboradores")}</div>,
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const org = row.original
+        const [openEdit, setOpenEdit] = React.useState(false)
+
+        const handleDelete = async () => {
+          const success = await deleteOrg(org.empresa_id)
+          if (success) {
+            await fetchOrgs()
+          }
+        }
+
+        return (
+          <div className="flex justify-end gap-2 w-full">
+            {/* Editar */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700"
+              onClick={() => setOpenEdit(true)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+
+            <NewOrgButton
+              mode="update"
+              org={org}
+              open={openEdit}
+              onOpenChange={setOpenEdit}
+              onOrgSaved={fetchOrgs}
+            />
+
+            {/* Excluir */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent className="bg-zinc-100">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir empresa?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação vai excluir {" "}<strong className="text-red-600">a empresa, as pessoas e os leads vinculados à ela</strong>. Deseja continuar?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                    onClick={handleDelete}
+                  >
+                    Sim, excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )
+      },
+    },
+  ]
 
   const table = useReactTable({
     data,
@@ -209,7 +211,12 @@ export function OrganizationList() {
           className="max-w-sm"
         />
         <div className="flex items-center justify-end space-x-2 py-4">
-          <Button onClick={() => setOpenCreate(true)} className="bg-zinc-100 text-black hover:bg-zinc-200">Nova Organização</Button>
+          <Button
+            onClick={() => setOpenCreate(true)}
+            className="bg-zinc-100 text-black hover:bg-zinc-200"
+          >
+            Nova Organização
+          </Button>
 
           <NewOrgButton
             mode="create"
@@ -226,8 +233,13 @@ export function OrganizationList() {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-[#293b4a]">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-black bg-[#EBEBEB]">
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <TableHead
+                    key={header.id}
+                    className="text-black bg-[#EBEBEB]"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -237,7 +249,10 @@ export function OrganizationList() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-200">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-zinc-200"
+                >
                   Carregando organizações...
                 </TableCell>
               </TableRow>
@@ -257,7 +272,10 @@ export function OrganizationList() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-zinc-200">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-zinc-200"
+                >
                   Nenhuma organização encontrada.
                 </TableCell>
               </TableRow>
@@ -270,7 +288,9 @@ export function OrganizationList() {
         <div className="text-muted-foreground flex-1 text-sm text-zinc-100">
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
           {table.getFilteredRowModel().rows.length}{" "}
-          {table.getFilteredRowModel().rows.length === 1 ? "linha selecionada" : "linhas selecionadas"}
+          {table.getFilteredRowModel().rows.length === 1
+            ? "linha selecionada"
+            : "linhas selecionadas"}
         </div>
         <div className="space-x-2">
           <Button

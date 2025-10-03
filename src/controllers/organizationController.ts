@@ -4,7 +4,7 @@ export interface CreateOrgData {
   nome: string
   email: string
   segmento: string
-  numero_colaboradores: number
+  num_colaboradores: number
 }
 
 export interface OrgResponse {
@@ -12,7 +12,7 @@ export interface OrgResponse {
   nome: string
   email: string
   segmento: string
-  numero_colaboradores: number
+  num_colaboradores: number
 }
 
 /**
@@ -35,7 +35,7 @@ export async function getOrgData(orgId: string): Promise<OrgResponse | null> {
     nome: data.nome ?? "",
     email: data.email ?? "",
     segmento: data.segmento ?? "Não informado",
-    numero_colaboradores: data.num_colaboradores ?? 0,
+    num_colaboradores: data.num_colaboradores ?? 0,
   }
 }
 
@@ -49,7 +49,7 @@ export async function createOrg(orgData: CreateOrgData): Promise<OrgResponse | n
       nome: orgData.nome,
       email: orgData.email,
       segmento: orgData.segmento,
-      num_colaboradores: orgData.numero_colaboradores,
+      num_colaboradores: orgData.num_colaboradores,
     })
     .select("empresa_id, nome, email, segmento, num_colaboradores")
     .single()
@@ -64,7 +64,7 @@ export async function createOrg(orgData: CreateOrgData): Promise<OrgResponse | n
     nome: data.nome,
     email: data.email,
     segmento: data.segmento,
-    numero_colaboradores: data.num_colaboradores,
+    num_colaboradores: data.num_colaboradores,
   }
 }
 
@@ -87,7 +87,7 @@ export async function getAllOrgs(): Promise<OrgResponse[]> {
     nome: org.nome ?? "",
     email: org.email ?? "",
     segmento: org.segmento ?? "Não informado",
-    numero_colaboradores: org.num_colaboradores ?? 0,
+    num_colaboradores: org.num_colaboradores ?? 0,
   }))
 }
 

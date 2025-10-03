@@ -67,7 +67,7 @@ function OrgForm({ className, mode, org, onOrgSaved }: OrgFormProps) {
     nome: org?.nome ?? "",
     email: org?.email ?? "",
     segmento: org?.segmento ?? "",
-    numero_colaboradores: org?.numero_colaboradores?.toString() ?? "",
+    num_colaboradores: org?.num_colaboradores?.toString() ?? "",
   })
 
   const [loading, setLoading] = React.useState(false)
@@ -87,7 +87,7 @@ function OrgForm({ className, mode, org, onOrgSaved }: OrgFormProps) {
         nome: formData.nome,
         email: formData.email,
         segmento: formData.segmento,
-        numero_colaboradores: Number(formData.numero_colaboradores) || 0,
+        num_colaboradores: Number(formData.num_colaboradores) || 0,
       }
 
       let result
@@ -146,14 +146,14 @@ function OrgForm({ className, mode, org, onOrgSaved }: OrgFormProps) {
       </div>
 
       <div className="grid gap-3">
-        <Label htmlFor="numero_colaboradores">Número de Colaboradores</Label>
+        <Label htmlFor="num_colaboradores">Número de Colaboradores</Label>
         <Input
           type="number"
-          id="numero_colaboradores"
+          id="num_colaboradores"
           placeholder="Ex: 50"
-          value={formData.numero_colaboradores}
+          value={formData.num_colaboradores}
           onChange={(e) =>
-            setFormData({ ...formData, numero_colaboradores: e.target.value })
+            setFormData({ ...formData, num_colaboradores: e.target.value })
           }
         />
       </div>

@@ -95,16 +95,33 @@ export const columns: ColumnDef<OrgResponse>[] = [
         }
 
       }
+      const [openEdit, setOpenEdit] = React.useState(false)
+      const [data, setData] = React.useState<OrgResponse[]>([])
+      const [loading, setLoading] = React.useState(false)
+      const fetchOrgs = async () => {
+        setLoading(true)
+        const orgs = await getAllOrgs()
+        setData(orgs)
+        setLoading(false)
+      }
       return (
         <div className="flex justify-end gap-2 w-full">
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700"
-            onClick={() => console.log("Editar:", org.nome)}
+            onClick={() => setOpenEdit(true)}
           >
             <Edit className="h-4 w-4" />
           </Button>
+
+          <NewOrgButton
+            mode="update"
+            org={org}
+            open={openEdit}
+            onOpenChange={setOpenEdit}
+            onOrgSaved={fetchOrgs}
+          />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -148,6 +165,7 @@ export function OrganizationList() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [openCreate, setOpenCreate] = React.useState(false)
 
   const fetchOrgs = async () => {
     setLoading(true)
@@ -191,7 +209,14 @@ export function OrganizationList() {
           className="max-w-sm"
         />
         <div className="flex items-center justify-end space-x-2 py-4">
-          <NewOrgButton onOrgCreated={fetchOrgs} />
+          <Button onClick={() => setOpenCreate(true)} className="bg-zinc-100 text-black hover:bg-zinc-200">Nova Organização</Button>
+
+          <NewOrgButton
+            mode="create"
+            open={openCreate}
+            onOpenChange={setOpenCreate}
+            onOrgSaved={fetchOrgs}
+          />
         </div>
       </div>
 

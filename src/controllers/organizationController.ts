@@ -107,3 +107,22 @@ export async function deleteOrg(orgId: string): Promise<boolean> {
 
   return true
 }
+
+/**
+ * Atualizar organização
+ */
+export async function updateOrg(orgId: string, data: Partial<CreateOrgData>): Promise<OrgResponse | null> {
+  const { data: updateData, error } = await supabase
+    .from("empresa")
+    .update(data)
+    .eq("empresa_id", orgId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Erro ao atualizar empresa: ", error)
+    return null
+  }
+
+  return updateData as OrgResponse
+}

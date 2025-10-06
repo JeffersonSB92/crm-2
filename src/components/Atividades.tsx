@@ -75,9 +75,9 @@ export default function AtividadesPage() {
       <div className="mt-4 grid-cols-2 text-left">
         <Tabs defaultValue="dia">
           <TabsList className="bg-zinc-200">
-            <TabsTrigger value="kanban" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("dia")}>Hoje</TabsTrigger>
-            <TabsTrigger value="lista" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("semana")}>Esta Semana</TabsTrigger>
-            <TabsTrigger value="atividades" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("mes")}>Este Mês</TabsTrigger>
+            <TabsTrigger value="dia" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("dia")}>Hoje</TabsTrigger>
+            <TabsTrigger value="semana" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("semana")}>Esta Semana</TabsTrigger>
+            <TabsTrigger value="mes" className="data-[state=active]:bg-[#232323] data-[state=active]:text-white" onClick={() => setViewMode("mes")}>Este Mês</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

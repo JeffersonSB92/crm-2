@@ -32,7 +32,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { getKanbanData, moveLeadToNextStep, deleteLead } from "@/controllers/kanbanController";
+import { getKanbanData, moveLeadToNextStep, deleteLead, updateLead, UpdateLeadData } from "@/controllers/kanbanController";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import AtividadesPage from "../components/Atividades";
@@ -216,6 +216,70 @@ export default function Dashboard() {
     }
   };
 
+  const handleUpdateLead = async (leadId: string, updateData: UpdateLeadData) => {
+    setMovingLead(leadId);
+
+    try {
+      const updatedLeadResponse = await updateLead(leadId, updateData);
+
+      if (!updatedLeadResponse) {
+        console.error("Erro: updateLead retornou null");
+        return;
+      }
+
+      // Converter o LeadResponse diretamente para LeadCard
+      const updatedLead: LeadCard = {
+        lead_id: updatedLeadResponse.lead_id,
+        step_id: updatedLeadResponse.step_id,
+        nome: updatedLeadResponse.pessoa?.nome ?? "Nome não informado",
+        iniciais: updatedLeadResponse.pessoa?.iniciais ?? "NI",
+        empresa: updatedLeadResponse.pessoa?.empresa?.nome ?? "Empresa não informada",
+        email: (updatedLeadResponse.pessoa as any)?.email ?? "Sem e-mail",
+        valor: 0, // ajusta se houver campo valor no banco
+        ultima_atualizacao: updatedLeadResponse.ultima_atualizacao ?? "Sem atualização",
+        atividade: updatedLeadResponse.atividade?.titulo ?? "Sem atividade",
+      };
+
+      setSteps(prevSteps => {
+        const newSteps = prevSteps.map(step => ({
+          ...step,
+          leads: [...step.leads],
+        }));
+
+        // Encontrar etapa antiga
+        const oldStepIndex = newSteps.findIndex(step =>
+          step.leads.some(lead => lead.lead_id === leadId)
+        );
+
+        // Encontrar nova etapa (caso o lead tenha mudado)
+        const newStepIndex = newSteps.findIndex(
+          step => step.step_id === updatedLead.step_id
+        );
+
+        // Remover lead antigo
+        if (oldStepIndex !== -1) {
+          newSteps[oldStepIndex].leads = newSteps[oldStepIndex].leads.filter(
+            lead => lead.lead_id !== leadId
+          );
+        }
+
+        // Adicionar lead atualizado
+        if (newStepIndex !== -1) {
+          newSteps[newStepIndex].leads.push(updatedLead);
+        }
+
+        return newSteps;
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar lead:", error);
+    } finally {
+      setMovingLead(null);
+    }
+  };
+
+
+
+
   return (
     <>
       <div className="grid grid-cols-4 gap-4 w-full">
@@ -305,6 +369,7 @@ export default function Dashboard() {
                                 step_id={lead.step_id}
                                 onMoveLead={handleMoveLead}
                                 onDeleteLead={handleDeleteLead}
+                                onEditLead={handleUpdateLead}
                                 canMoveForward={!isLastStep && !isMoving}
                                 isMoving={isMoving}
                               />

@@ -27,6 +27,16 @@ export interface LeadResponse {
   } | null
 }
 
+export interface UpdateLeadData {
+  nome?: string
+  email?: string
+  telefone?: string
+  cargo?: string
+  empresa_id?: string
+  step_id?: string
+  atividade_id?: string | null
+}
+
 export async function getKanbanData(kanbanId: string): Promise<StepWithLeads[]> {
   // Buscar todos os steps do kanban
   const { data: steps, error: stepsError } = await supabase
@@ -318,6 +328,110 @@ export async function createEmpresa(nome: string): Promise<{ empresa_id: string 
     return data
   } catch (error) {
     console.error("Erro geral ao criar empresa:", error)
+    return null
+  }
+}
+
+export async function updateLead(leadId: string, updateData: UpdateLeadData): Promise<LeadResponse | null> {
+  try {
+    // 🔹 Buscar o lead original para pegar o pessoa_id
+    const { data: leadData, error: fetchError } = await supabase
+      .from("lead")
+      .select("pessoa_id")
+      .eq("lead_id", leadId)
+      .single()
+
+    if (fetchError || !leadData) {
+      console.error("Erro ao buscar lead:", fetchError)
+      return null
+    }
+
+    const pessoaId = leadData.pessoa_id
+
+    // 🔹 Atualizar dados da pessoa (caso existam campos de pessoa)
+    if (updateData.nome || updateData.email || updateData.telefone || updateData.cargo || updateData.empresa_id) {
+      const { error: pessoaError } = await supabase
+        .from("pessoa")
+        .update({
+          nome: updateData.nome,
+          email: updateData.email,
+          telefone: updateData.telefone,
+          cargo: updateData.cargo,
+          empresa_id: updateData.empresa_id
+        })
+        .eq("pessoa_id", pessoaId)
+
+      if (pessoaError) {
+        console.error("Erro ao atualizar pessoa:", pessoaError)
+        return null
+      }
+    }
+
+    // 🔹 Atualizar dados do lead
+    const { data: updatedLead, error: leadError } = await supabase
+      .from("lead")
+      .update({
+        step_id: updateData.step_id,
+        atividade_id: updateData.atividade_id,
+        ultima_atualizacao: new Date().toISOString()
+      })
+      .eq("lead_id", leadId)
+      .select(`
+        lead_id,
+        step_id,
+        ultima_atualizacao,
+        pessoa:pessoa_id (
+          nome,
+          iniciais,
+          empresa:empresa_id (
+            nome
+          )
+        ),
+        atividade:atividade_id (
+          titulo
+        )
+      `)
+      .single()
+
+    if (leadError) {
+      console.error("Erro ao atualizar lead:", leadError)
+      return null
+    }
+
+    // --- Normalização ---
+    const pessoaRaw = Array.isArray(updatedLead.pessoa)
+      ? updatedLead.pessoa[0]
+      : updatedLead.pessoa
+
+    const atividadeRaw = Array.isArray(updatedLead.atividade)
+      ? updatedLead.atividade[0]
+      : updatedLead.atividade
+
+    const empresaRaw = pessoaRaw
+      ? (Array.isArray(pessoaRaw.empresa) ? pessoaRaw.empresa[0] : pessoaRaw.empresa)
+      : null
+
+    const normalizedLead: LeadResponse = {
+      lead_id: updatedLead.lead_id,
+      step_id: updatedLead.step_id,
+      ultima_atualizacao: updatedLead.ultima_atualizacao,
+      pessoa: pessoaRaw
+        ? {
+          nome: pessoaRaw.nome ?? "",
+          iniciais: pessoaRaw.iniciais ?? "",
+          empresa: { nome: empresaRaw?.nome ?? "" },
+        }
+        : { nome: "", iniciais: "", empresa: { nome: "" } },
+      atividade: atividadeRaw
+        ? { titulo: atividadeRaw.titulo ?? "" }
+        : null
+    }
+
+    console.log(`Lead ${leadId} atualizado com sucesso!`)
+    return normalizedLead
+
+  } catch (error) {
+    console.error("Erro geral ao atualizar lead:", error)
     return null
   }
 }

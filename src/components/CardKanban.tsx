@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardAction,
@@ -8,15 +10,23 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Phone, Clock, MoveRight, MoreVertical, Trash2, Edit } from "lucide-react";
+} from "@/components/ui/card"
+import { Avatar, AvatarFallback } from "./ui/avatar"
+import {
+  Phone,
+  Clock,
+  MoveRight,
+  MoreVertical,
+  Trash2,
+  Edit,
+  Info,
+} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"
 import {
   Dialog,
   DialogContent,
@@ -35,23 +45,33 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/dialog"
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+  SheetFooter,
+} from "@/components/ui/sheet"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export interface CardKanbanProps {
-  nome: string;
-  empresa: string;
-  ultima_atualizacao: string;
-  atividade: string;
-  iniciais: string;
-  lead_id: string;
-  step_id: string;
-  onMoveLead?: (leadId: string, currentStepId: string) => void;
-  onDeleteLead?: (leadId: string) => void;
-  onEditLead?: (leadId: string, updatedData: { nome: string; empresa: string; atividade: string }) => void;
-  canMoveForward?: boolean;
-  isMoving?: boolean;
+  nome: string
+  empresa: string
+  ultima_atualizacao: string
+  atividade: string
+  iniciais: string
+  lead_id: string
+  step_id: string
+  onMoveLead?: (leadId: string, currentStepId: string) => void
+  onDeleteLead?: (leadId: string) => void
+  onEditLead?: (leadId: string, updatedData: { nome: string; empresa: string; atividade: string }) => void
+  canMoveForward?: boolean
+  isMoving?: boolean
 }
 
 export function CardKanban({
@@ -68,22 +88,23 @@ export function CardKanban({
   canMoveForward = true,
   isMoving = false,
 }: CardKanbanProps) {
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editedNome, setEditedNome] = useState(nome);
-  const [editedEmpresa, setEditedEmpresa] = useState(empresa);
-  const [editedAtividade, setEditedAtividade] = useState(atividade);
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editedNome, setEditedNome] = useState(nome)
+  const [editedEmpresa, setEditedEmpresa] = useState(empresa)
+  const [editedAtividade, setEditedAtividade] = useState(atividade)
+  const [infoSheetOpen, setInfoSheetOpen] = useState(false)
 
   const handleMoveForward = () => {
     if (onMoveLead && canMoveForward && !isMoving) {
-      onMoveLead(lead_id, step_id);
+      onMoveLead(lead_id, step_id)
     }
-  };
+  }
 
   const handleDelete = () => {
     if (onDeleteLead && !isMoving) {
-      onDeleteLead(lead_id);
+      onDeleteLead(lead_id)
     }
-  };
+  }
 
   const handleSave = () => {
     if (onEditLead) {
@@ -91,16 +112,17 @@ export function CardKanban({
         nome: editedNome,
         empresa: editedEmpresa,
         atividade: editedAtividade,
-      });
-      setEditDialogOpen(false);
+      })
+      setEditDialogOpen(false)
     }
-  };
+  }
 
   return (
     <Card className={`w-full max-w-sm bg-[#293b4a] ${isMoving ? "opacity-50 animate-pulse" : ""}`}>
       <CardHeader>
         <CardTitle className="text-white">{nome}</CardTitle>
         <CardDescription className="text-white">{empresa}</CardDescription>
+
         <CardAction>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -108,18 +130,68 @@ export function CardKanban({
                 <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="bg-white">
+              {/* === SHEET DE INFORMAÇÕES === */}
+              <Sheet open={infoSheetOpen} onOpenChange={setInfoSheetOpen}>
+                <SheetTrigger asChild>
+                  <DropdownMenuItem
+                    className="hover:bg-blue-50 cursor-pointer"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Info size={16} className="mr-2" />
+                    Infos
+                  </DropdownMenuItem>
+                </SheetTrigger>
+
+                <SheetContent className="bg-white sm:max-w-[850px]">
+                  <SheetHeader>
+                    <SheetTitle>Informações do Lead</SheetTitle>
+                    <SheetDescription>Veja os detalhes deste lead.</SheetDescription>
+                  </SheetHeader>
+
+                  <div className="py-4 space-y-4 ml-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Nome</p>
+                      <p className="text-base font-medium text-gray-900">{nome}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-500">Empresa</p>
+                      <p className="text-base font-medium text-gray-900">{empresa}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-500">Atividade</p>
+                      <p className="text-base font-medium text-gray-900">{atividade}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-500">Última atualização</p>
+                      <p className="text-base font-medium text-gray-900">{ultima_atualizacao}</p>
+                    </div>
+                  </div>
+
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button variant="outline">Fechar</Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
+
               {/* === MODAL DE EDIÇÃO === */}
               <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogTrigger asChild>
                   <DropdownMenuItem
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                    className="hover:bg-blue-50 cursor-pointer"
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <Edit size={16} className="mr-2 text-blue-600" />
+                    <Edit size={16} className="mr-2" />
                     Editar
                   </DropdownMenuItem>
                 </DialogTrigger>
+
                 <DialogContent className="bg-white sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Editar Lead</DialogTitle>
@@ -178,13 +250,14 @@ export function CardKanban({
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                    className="text-red-600 hover:!text-red-600 hover:bg-red-50 cursor-pointer"
                     onSelect={(e) => e.preventDefault()}
                   >
                     <Trash2 size={16} className="mr-2 text-red-600" />
                     Excluir
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
+
                 <AlertDialogContent className="bg-white">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-gray-900">Excluir Lead</AlertDialogTitle>
@@ -196,6 +269,7 @@ export function CardKanban({
                       Esta ação não pode ser desfeita e o lead será removido permanentemente do sistema.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
+
                   <AlertDialogFooter>
                     <AlertDialogCancel className="border-gray-300 text-gray-700 hover:bg-gray-50">
                       Cancelar
@@ -237,6 +311,7 @@ export function CardKanban({
             <Phone size={18} />
           </Button>
         </div>
+
         <Button
           variant="ghost"
           className="justify-end text-white"
@@ -247,5 +322,5 @@ export function CardKanban({
         </Button>
       </CardFooter>
     </Card>
-  );
+  )
 }

@@ -65,8 +65,8 @@ function SidebarContent() {
     <div className="flex h-full flex-col w-52 h-screen bg-[#293b4a] text-white flex flex-col p-2">
       {/* Header */}
       <div className="flex h-14 items-center border-b px-2">
-        <Image src="/slothIcon.svg" alt="Sloth CRM" width={40} height={40} />
-        <h2 className="text-1xl font-bold ml-2">Sloth CRM</h2>
+        <Image src="/slothIcon.svg" alt="Seedly CRM" width={40} height={40} />
+        <h2 className="text-1xl font-bold ml-2">Seedly CRM</h2>
       </div>
 
       {/* Main Nav */}

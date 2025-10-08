@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
   Phone,
   Clock,
@@ -20,6 +20,7 @@ import {
   Trash2,
   Edit,
   Info,
+  BellOff
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -58,6 +59,9 @@ import {
 } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Badge } from "./ui/badge"
+import { Separator } from "./ui/separator"
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "./ui/empty"
 
 export interface CardKanbanProps {
   nome: string
@@ -144,40 +148,63 @@ export function CardKanban({
                   </DropdownMenuItem>
                 </SheetTrigger>
 
-                <SheetContent className="bg-white sm:max-w-[850px]">
-                  <SheetHeader>
-                    <SheetTitle>Informações do Lead</SheetTitle>
-                    <SheetDescription>Veja os detalhes deste lead.</SheetDescription>
-                  </SheetHeader>
+                <SheetContent className="bg-[#1e293b] sm:max-w-[850px] text-white flex flex-col">
+                  <div className="flex-1 px-6 flex flex-col">
+                    <SheetHeader className="mt-6" />
 
-                  <div className="py-4 space-y-4 ml-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Nome</p>
-                      <p className="text-base font-medium text-gray-900">{nome}</p>
+                    {/* Card com avatar e informações */}
+                    <div className="flex items-center bg-[#0d1b2a] p-4 ml-4 mr-4 rounded-xl border-2 border-zinc-900">
+                      <Avatar className="ml-4 h-50 w-50 border-2 border-zinc-500">
+                        <AvatarImage src="profile.png" />
+                        <AvatarFallback className="bg-[#293b4a] font-bold text-4xl">
+                          {iniciais}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="ml-6">
+                        <p className="font-bold text-2xl text-white">{nome}</p>
+                        <p className="text-sm font-medium text-zinc-400">{empresa}</p>
+                        <Badge className="text-white border-1 border-zinc-500">
+                          {atividade}
+                        </Badge>
+                        <p className="text-xs text-zinc-400 mt-16">
+                          Última atualização: {ultima_atualizacao}
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <p className="text-sm text-gray-500">Empresa</p>
-                      <p className="text-base font-medium text-gray-900">{empresa}</p>
+                    <Separator className="border-1 border-zinc-600 mt-4" />
+
+                    {/* Botões superiores */}
+                    <div className="flex justify-center mt-4">
+                      <Button className="mr-4 hover:bg-[#0d1b2a6b]">Criar Atividade</Button>
+                      <Button className="mr-4 hover:bg-[#0d1b2a6b]">Ver Agenda</Button>
+                      <Button className="mr-4 hover:bg-[#0d1b2a6b]">Timeline</Button>
                     </div>
 
-                    <div>
-                      <p className="text-sm text-gray-500">Atividade</p>
-                      <p className="text-base font-medium text-gray-900">{atividade}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Última atualização</p>
-                      <p className="text-base font-medium text-gray-900">{ultima_atualizacao}</p>
+                    {/* 🔽 Container flex que centraliza o Empty verticalmente */}
+                    <div className="flex-1 flex items-center justify-center mt-6 mb-6">
+                      <Empty className="bg-[#0d1b2a] py-12 px-6 rounded-xl w-full max-w-md">
+                        <EmptyHeader>
+                          <EmptyMedia variant="icon">
+                            <BellOff />
+                          </EmptyMedia>
+                          <EmptyTitle>No Notifications</EmptyTitle>
+                          <EmptyDescription>
+                            You&apos;re all caught up. New notifications will appear here.
+                          </EmptyDescription>
+                        </EmptyHeader>
+                      </Empty>
                     </div>
                   </div>
 
-                  <SheetFooter>
+                  {/* Rodapé fixo no final */}
+                  <SheetFooter className="px-6 pb-6">
                     <SheetClose asChild>
-                      <Button variant="outline">Fechar</Button>
+                      <Button className="w-full">Fechar</Button>
                     </SheetClose>
                   </SheetFooter>
                 </SheetContent>
+
               </Sheet>
 
               {/* === MODAL DE EDIÇÃO === */}
@@ -305,6 +332,7 @@ export function CardKanban({
       <CardFooter className="grid-col-2 justify-between">
         <div className="grid grid-cols-3 items-center">
           <Avatar className="mr-2">
+            <AvatarImage src="profile.png" />
             <AvatarFallback className="bg-white text-black">{iniciais}</AvatarFallback>
           </Avatar>
           <Button variant="ghost" className="text-white hover:text-black">
